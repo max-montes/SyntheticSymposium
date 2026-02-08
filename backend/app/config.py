@@ -7,8 +7,8 @@ class Settings(BaseSettings):
 
     # GitHub Models API
     github_token: str = ""
-    github_models_endpoint: str = "https://models.github.ai/inference/chat/completions"
-    default_model: str = "openai/gpt-4.1"
+    github_models_endpoint: str = "https://models.inference.ai.azure.com/chat/completions"
+    default_model: str = "gpt-4o-mini"
 
     # ElevenLabs TTS
     elevenlabs_api_key: str = ""
