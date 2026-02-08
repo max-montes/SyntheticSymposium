@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     # Application
     app_env: str = "development"
     app_debug: bool = True
-    cors_origins: str = "http://localhost:5173"
+    cors_origins: str = "http://localhost:5173,https://max-montes.github.io"
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 

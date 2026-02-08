@@ -1,4 +1,15 @@
-const API_BASE = '/api'
+const API_BASE = import.meta.env.VITE_API_URL || '/api'
+
+// In production, audio/static URLs from the API are relative paths like /audio/xxx.mp3
+// They need the full backend origin prepended when frontend is on a different domain
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || ''
+
+/** Resolve a backend-relative URL (audio, static) to a full URL */
+export function resolveBackendUrl(path: string | null | undefined): string {
+  if (!path) return ''
+  if (path.startsWith('http')) return path
+  return BACKEND_URL + path
+}
 
 export interface Thinker {
   id: string
@@ -105,7 +116,7 @@ export interface TimingsData {
 }
 
 export async function fetchWordTimings(audioUrl: string): Promise<TimingsData | null> {
-  const timingsUrl = audioUrl.replace('.mp3', '.json')
+  const timingsUrl = resolveBackendUrl(audioUrl).replace('.mp3', '.json')
   try {
     const res = await fetch(timingsUrl)
     if (!res.ok) return null

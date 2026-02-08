@@ -1,3 +1,5 @@
+import { resolveBackendUrl } from '../api/client'
+
 interface ThinkerAvatarProps {
   name: string
   imageUrl?: string | null
@@ -12,10 +14,12 @@ export default function ThinkerAvatar({ name, imageUrl, size = 'md' }: ThinkerAv
     xl: 'w-28 h-28 text-4xl',
   }
 
-  if (imageUrl) {
+  const resolvedUrl = resolveBackendUrl(imageUrl)
+
+  if (resolvedUrl) {
     return (
       <img
-        src={imageUrl}
+        src={resolvedUrl}
         alt={name}
         className={`${sizeClasses[size].split(' ').slice(0, 2).join(' ')} rounded-full object-cover shrink-0`}
       />

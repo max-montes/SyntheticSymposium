@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import Markdown from 'react-markdown'
-import { fetchLecture, fetchWordTimings, type Lecture, type TimingsData } from '../api/client'
+import { fetchLecture, fetchWordTimings, resolveBackendUrl, type Lecture, type TimingsData } from '../api/client'
 import SyncedTranscript from '../components/SyncedTranscript'
 import ThinkerAvatar from '../components/ThinkerAvatar'
 import AudioPlayer from '../components/AudioPlayer'
@@ -65,7 +65,7 @@ export default function LecturePage() {
 
       {/* Audio Player */}
       {lecture.audio_url && (
-        <AudioPlayer src={lecture.audio_url} audioRef={audioRef} />
+        <AudioPlayer src={resolveBackendUrl(lecture.audio_url)} audioRef={audioRef} />
       )}
 
       {/* Transcript */}
