@@ -55,6 +55,28 @@ export async function fetchCourses(thinkerId?: string): Promise<Course[]> {
   return res.json()
 }
 
+export async function fetchCourse(id: string): Promise<Course> {
+  const res = await fetch(`${API_BASE}/courses/${id}`)
+  if (!res.ok) throw new Error('Failed to fetch course')
+  return res.json()
+}
+
+export async function createCourse(data: {
+  title: string
+  description: string
+  thinker_id: string
+  difficulty_level?: string
+  num_lectures?: number
+}): Promise<Course> {
+  const res = await fetch(`${API_BASE}/courses/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  if (!res.ok) throw new Error('Failed to create course')
+  return res.json()
+}
+
 export async function fetchLectures(courseId: string): Promise<Lecture[]> {
   const res = await fetch(`${API_BASE}/lectures/?course_id=${courseId}`)
   if (!res.ok) throw new Error('Failed to fetch lectures')

@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage'
 import ThinkersPage from './pages/ThinkersPage'
 import ThinkerDetailPage from './pages/ThinkerDetailPage'
 import CoursesPage from './pages/CoursesPage'
+import CourseDetailPage from './pages/CourseDetailPage'
 import LecturePage from './pages/LecturePage'
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/thinkers" element={<ThinkersPage />} />
         <Route path="/thinkers/:id" element={<ThinkerDetailPage />} />
         <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/courses/:id" element={<CourseDetailPage />} />
         <Route path="/lectures/:id" element={<LecturePage />} />
       </Route>
     </Routes>
