@@ -44,7 +44,7 @@ async def generate_lecture_transcript(
                     {"role": "user", "content": user_message},
                 ],
                 "temperature": 0.8,
-                "max_tokens": 4096,
+                "max_tokens": 8192,
             },
         )
         response.raise_for_status()
