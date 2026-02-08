@@ -21,7 +21,7 @@ VOICE_MAP: dict[str, str] = {
     "Carl Sagan": "en-US-TonyNeural",
     "Alan Turing": "en-GB-ThomasNeural",
     "Ludwig Wittgenstein": "en-GB-RyanNeural",
-    "Fyodor Dostoevsky": "en-US-DavisNeural",
+    "Fyodor Dostoevsky": "en-US-GuyNeural",
     "Siddhartha Gautama": "en-IN-PrabhatNeural",
     "Simone de Beauvoir": "fr-FR-DeniseNeural",
 }
