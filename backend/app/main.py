@@ -51,6 +51,11 @@ def create_app() -> FastAPI:
     os.makedirs(audio_dir, exist_ok=True)
     application.mount("/audio", StaticFiles(directory=audio_dir), name="audio")
 
+    # Serve static assets (thinker images, etc.)
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+    os.makedirs(static_dir, exist_ok=True)
+    application.mount("/static", StaticFiles(directory=static_dir), name="static")
+
     return application
 
 

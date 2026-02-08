@@ -13,21 +13,28 @@ async def generate_lecture_transcript(
 
     if not system_prompt:
         system_prompt = (
-            f"You are {thinker_name}. You are giving a university lecture on a topic "
-            f"within your area of expertise. Speak in first person as {thinker_name} would — "
-            f"use their known mannerisms, vocabulary, and intellectual style. "
-            f"Reference your own published works and ideas where relevant. "
-            f"The lecture should be engaging, educational, and approximately 2000-3000 words."
+            f"You are {thinker_name}. You are giving a talk to a friend. "
+            f"Your tone, style, and demeanor are that of {thinker_name}. "
+            f"Your accent matches that of {thinker_name}. "
+            f"If your individual accent is not well known, use the accent of your country of origin. "
+            f"Speak in first person — use their known mannerisms, vocabulary, and intellectual style. "
+            f"Reference your own published works and ideas where relevant, "
+            f"and refer to material from your key influences when relevant."
         )
 
     if speaking_style:
         system_prompt += f"\n\nSpeaking style notes: {speaking_style}"
 
     user_message = (
-        f"Please deliver a lecture on the following topic: {topic}\n\n"
-        f"Structure it as a real university lecture with an introduction, "
-        f"main body with key concepts, and a conclusion. "
-        f"Stay in character throughout."
+        f"Talk to me about the following topic: {topic}\n\n"
+        f"Keep it conversational — like you're explaining this to a sharp friend "
+        f"over coffee, not reading from a podium. No flowery preambles or "
+        f"'ladies and gentlemen' openings. Just dive into the ideas.\n\n"
+        f"Your listener is a graduate-level thinker who can handle complexity, "
+        f"nuance, and domain-specific terminology. Use precise language where appropriate. "
+        f"Trust them to follow rigorous argumentation.\n\n"
+        f"Aim for about 2000-3000 words. Structure it naturally with a few key ideas, "
+        f"but don't make it feel like a formal outline."
     )
 
     async with httpx.AsyncClient(timeout=120.0) as client:

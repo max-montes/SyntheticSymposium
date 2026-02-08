@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { fetchThinker, fetchCourses, createCourse, type Thinker, type Course } from '../api/client'
+import ThinkerAvatar from '../components/ThinkerAvatar'
 
 export default function ThinkerDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -40,61 +41,66 @@ export default function ThinkerDetailPage() {
     }
   }
 
-  if (loading) return <p className="text-center py-12 font-sans">Loading...</p>
-  if (!thinker) return <p className="text-center py-12 font-sans text-red-600">Thinker not found</p>
+  if (loading) return <p className="text-center py-12 font-sans text-muted">Loading…</p>
+  if (!thinker) return <p className="text-center py-12 font-sans text-burgundy">Thinker not found</p>
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
+      {/* Header */}
       <div className="flex items-start gap-6">
-        <div className="w-24 h-24 bg-navy/10 rounded-full flex items-center justify-center shrink-0">
-          <span className="text-4xl font-bold text-navy">{thinker.name.charAt(0)}</span>
+        <div className="ring-2 ring-gold/30 rounded-full shrink-0">
+          <ThinkerAvatar name={thinker.name} imageUrl={thinker.image_url} size="xl" />
         </div>
-        <div>
-          <h1 className="text-4xl font-bold">{thinker.name}</h1>
-          <p className="text-gold font-sans font-medium">{thinker.era}</p>
-          <p className="text-ink/50 font-sans text-sm">{thinker.nationality}</p>
-          <p className="mt-4 text-ink/80 leading-relaxed">{thinker.bio}</p>
+        <div className="min-w-0">
+          <h1 className="text-3xl md:text-4xl font-bold">{thinker.name}</h1>
+          <div className="flex items-center gap-3 mt-1">
+            <span className="badge">{thinker.era}</span>
+            <span className="text-muted font-sans text-sm">{thinker.nationality}</span>
+          </div>
+          <p className="mt-4 leading-relaxed font-sans text-sm">{thinker.bio}</p>
         </div>
       </div>
 
+      {/* Personality */}
       {thinker.personality_traits && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gold/20">
-          <h2 className="text-lg font-bold mb-2">Personality</h2>
-          <p className="text-ink/70 font-sans text-sm">{thinker.personality_traits}</p>
+        <div className="card p-6">
+          <h2 className="text-sm font-sans font-semibold uppercase tracking-wider text-gold mb-2">Personality & Style</h2>
+          <p className="text-muted font-sans text-sm leading-relaxed">{thinker.personality_traits}</p>
         </div>
       )}
 
+      {/* Courses */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold">Courses</h2>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2 text-sm font-sans bg-gold text-white rounded-lg hover:bg-gold/90 transition-colors"
+            className={showForm ? 'btn-ghost' : 'btn-primary'}
           >
             {showForm ? 'Cancel' : '+ New Course'}
           </button>
         </div>
 
         {showForm && (
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gold/20 mb-4 space-y-3">
+          <div className="card p-6 mb-4 space-y-3">
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Course title, e.g. 'The Philosophy of Mind'"
-              className="w-full px-4 py-3 border border-ink/20 rounded-lg font-sans text-sm focus:outline-none focus:ring-2 focus:ring-gold/50"
+              className="input"
             />
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief description (optional)"
               rows={2}
-              className="w-full px-4 py-3 border border-ink/20 rounded-lg font-sans text-sm focus:outline-none focus:ring-2 focus:ring-gold/50 resize-none"
+              className="input resize-none"
             />
             <button
               onClick={handleCreate}
               disabled={creating || !title.trim()}
-              className="px-6 py-3 bg-navy text-white rounded-lg font-sans font-medium hover:bg-navy/90 transition-colors disabled:opacity-50"
+              className="btn-primary"
             >
               {creating ? 'Creating…' : 'Create Course'}
             </button>
@@ -102,20 +108,23 @@ export default function ThinkerDetailPage() {
         )}
 
         {courses.length === 0 && !showForm ? (
-          <p className="text-ink/50 font-sans">No courses yet for this thinker.</p>
+          <div className="card p-8 text-center">
+            <p className="text-muted font-sans">No courses yet. Create one to get started!</p>
+          </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {courses.map((c) => (
               <Link
                 key={c.id}
                 to={`/courses/${c.id}`}
-                className="block bg-white rounded-xl p-6 shadow-sm border border-gold/20 hover:shadow-md transition-shadow"
+                className="card-interactive block p-5 group"
               >
-                <h3 className="text-lg font-bold">{c.title}</h3>
-                <p className="text-ink/60 font-sans text-sm mt-1">{c.description}</p>
-                <div className="flex gap-4 mt-3 text-xs font-sans text-ink/40">
-                  <span className="uppercase">{c.difficulty_level}</span>
-                  <span>{c.num_lectures} lectures</span>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <h3 className="text-lg font-bold group-hover:text-gold transition-colors">{c.title}</h3>
+                    <p className="text-muted font-sans text-sm mt-1 line-clamp-2">{c.description}</p>
+                  </div>
+                  <span className="badge shrink-0 mt-1">{c.difficulty_level}</span>
                 </div>
               </Link>
             ))}
@@ -123,8 +132,8 @@ export default function ThinkerDetailPage() {
         )}
       </div>
 
-      <Link to="/thinkers" className="inline-block text-navy font-sans text-sm hover:text-gold transition-colors">
-        ← Back to all thinkers
+      <Link to="/" className="back-link">
+        ← Back to home
       </Link>
     </div>
   )

@@ -10,8 +10,12 @@ class Settings(BaseSettings):
     github_models_endpoint: str = "https://models.inference.ai.azure.com/chat/completions"
     default_model: str = "gpt-4o-mini"
 
-    # ElevenLabs TTS
-    elevenlabs_api_key: str = ""
+    # OpenAI TTS
+    openai_api_key: str = ""
+    tts_provider: str = "edge-tts"  # "openai" or "edge-tts"
+
+    # Admin
+    admin_api_key: str = ""
 
     # Application
     app_env: str = "development"

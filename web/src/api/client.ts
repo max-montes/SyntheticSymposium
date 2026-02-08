@@ -21,6 +21,7 @@ export interface Course {
   difficulty_level: string
   num_lectures: number
   thinker_id: string
+  thinker_name?: string
 }
 
 export interface Lecture {
@@ -34,6 +35,9 @@ export interface Lecture {
   course_id: string
   created_at: string
   updated_at: string
+  thinker_name?: string | null
+  thinker_image_url?: string | null
+  course_title?: string | null
 }
 
 export async function fetchThinkers(): Promise<Thinker[]> {
@@ -89,20 +93,24 @@ export async function fetchLecture(id: string): Promise<Lecture> {
   return res.json()
 }
 
-export async function generateLecture(courseId: string, topic: string): Promise<Lecture> {
-  const res = await fetch(`${API_BASE}/lectures/generate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ course_id: courseId, topic }),
-  })
-  if (!res.ok) throw new Error('Failed to generate lecture')
-  return res.json()
+export interface WordTiming {
+  s: number   // start time in ms
+  e: number   // end time in ms
+  p: number   // paragraph index
 }
 
-export async function generateAudio(lectureId: string): Promise<Lecture> {
-  const res = await fetch(`${API_BASE}/lectures/${lectureId}/generate-audio`, {
-    method: 'POST',
-  })
-  if (!res.ok) throw new Error('Failed to generate audio')
-  return res.json()
+export interface TimingsData {
+  p: string[]        // paragraph texts (with punctuation)
+  w: WordTiming[]    // word timings
+}
+
+export async function fetchWordTimings(audioUrl: string): Promise<TimingsData | null> {
+  const timingsUrl = audioUrl.replace('.mp3', '.json')
+  try {
+    const res = await fetch(timingsUrl)
+    if (!res.ok) return null
+    return res.json()
+  } catch {
+    return null
+  }
 }

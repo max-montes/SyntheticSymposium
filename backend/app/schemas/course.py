@@ -18,5 +18,6 @@ class CourseCreate(CourseBase):
 
 class CourseResponse(CourseBase):
     id: uuid.UUID
+    thinker_name: str | None = None
 
     model_config = {"from_attributes": True}

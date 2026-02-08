@@ -1,5 +1,6 @@
 """Text-to-speech service using edge-tts (Microsoft Edge TTS engine)."""
 
+import json
 import os
 import re
 import uuid
@@ -10,7 +11,6 @@ import edge_tts
 AUDIO_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "audio")
 
 # Voice mapping: thinker name → edge-tts voice ID
-# Chosen to suggest each thinker's nationality/character
 VOICE_MAP: dict[str, str] = {
     "Albert Einstein": "en-US-GuyNeural",
     "Friedrich Nietzsche": "de-DE-ConradNeural",
@@ -27,6 +27,8 @@ VOICE_MAP: dict[str, str] = {
 }
 
 DEFAULT_VOICE = "en-US-GuyNeural"
+
+TICKS_PER_MS = 10_000  # 1 tick = 100 nanoseconds
 
 
 def strip_markdown(text: str) -> str:
@@ -68,6 +70,7 @@ async def generate_audio(
 ) -> AudioResult:
     """Generate an MP3 audio file from a lecture transcript.
 
+    Also generates a word-timing JSON file for transcript sync.
     Returns an AudioResult with the URL path and estimated duration.
     """
     os.makedirs(AUDIO_DIR, exist_ok=True)
@@ -75,12 +78,50 @@ async def generate_audio(
     voice = get_voice_for_thinker(thinker_name)
     clean_text = strip_markdown(transcript)
 
-    filename = f"{lecture_id}.mp3"
-    filepath = os.path.join(AUDIO_DIR, filename)
+    # Determine paragraph boundaries for word-to-paragraph mapping
+    paragraphs = [p.strip() for p in clean_text.split("\n\n") if p.strip()]
+    para_word_counts = [len(p.split()) for p in paragraphs]
 
-    communicate = edge_tts.Communicate(clean_text, voice)
-    await communicate.save(filepath)
+    communicate = edge_tts.Communicate(clean_text, voice, boundary="WordBoundary")
+
+    audio_chunks: list[bytes] = []
+    word_timings: list[dict] = []
+    global_word_idx = 0
+
+    async for chunk in communicate.stream():
+        if chunk["type"] == "audio":
+            audio_chunks.append(chunk["data"])
+        elif chunk["type"] == "WordBoundary":
+            offset_ms = chunk["offset"] // TICKS_PER_MS
+            duration_ms = chunk["duration"] // TICKS_PER_MS
+
+            # Determine paragraph index from cumulative word count
+            para_idx = 0
+            cumulative = 0
+            for i, count in enumerate(para_word_counts):
+                cumulative += count
+                if global_word_idx < cumulative:
+                    para_idx = i
+                    break
+
+            word_timings.append({
+                "s": offset_ms,
+                "e": offset_ms + duration_ms,
+                "p": para_idx,
+            })
+            global_word_idx += 1
+
+    # Write audio file
+    filepath = os.path.join(AUDIO_DIR, f"{lecture_id}.mp3")
+    with open(filepath, "wb") as f:
+        for audio_data in audio_chunks:
+            f.write(audio_data)
+
+    # Write word timings JSON (includes paragraph text for punctuation)
+    timings_path = os.path.join(AUDIO_DIR, f"{lecture_id}.json")
+    with open(timings_path, "w", encoding="utf-8") as f:
+        json.dump({"p": paragraphs, "w": word_timings}, f, ensure_ascii=False)
 
     duration = estimate_duration_seconds(clean_text)
 
-    return AudioResult(url=f"/audio/{filename}", duration_seconds=duration)
+    return AudioResult(url=f"/audio/{lecture_id}.mp3", duration_seconds=duration)

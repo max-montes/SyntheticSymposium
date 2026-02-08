@@ -15,6 +15,7 @@ class LectureCreate(LectureBase):
 
 
 class LectureGenerateRequest(BaseModel):
+    title: str
     topic: str
     course_id: uuid.UUID
 
@@ -27,5 +28,9 @@ class LectureResponse(LectureBase):
     duration_seconds: int | None = None
     created_at: datetime
     updated_at: datetime
+    # Enriched fields (populated by router)
+    thinker_name: str | None = None
+    thinker_image_url: str | None = None
+    course_title: str | None = None
 
     model_config = {"from_attributes": True}

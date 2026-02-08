@@ -7,6 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from app.db.session import get_db
 from app.models.course import Course
+from app.models.thinker import Thinker  # noqa: F401 — needed for selectinload
 from app.schemas.course import CourseCreate, CourseResponse
 
 router = APIRouter(prefix="/api/courses", tags=["courses"])
@@ -16,24 +17,34 @@ router = APIRouter(prefix="/api/courses", tags=["courses"])
 async def list_courses(
     thinker_id: uuid.UUID | None = None, db: AsyncSession = Depends(get_db)
 ):
-    query = select(Course).order_by(Course.title)
+    query = select(Course).options(selectinload(Course.thinker)).order_by(Course.title)
     if thinker_id:
         query = query.where(Course.thinker_id == thinker_id)
     result = await db.execute(query)
-    return result.scalars().all()
+    courses = result.scalars().all()
+    response = []
+    for c in courses:
+        data = CourseResponse.model_validate(c)
+        if c.thinker:
+            data.thinker_name = c.thinker.name
+        response.append(data)
+    return response
 
 
 @router.get("/{course_id}", response_model=CourseResponse)
 async def get_course(course_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
         select(Course)
-        .options(selectinload(Course.lectures))
+        .options(selectinload(Course.lectures), selectinload(Course.thinker))
         .where(Course.id == course_id)
     )
     course = result.scalar_one_or_none()
     if not course:
         raise HTTPException(status_code=404, detail="Course not found")
-    return course
+    data = CourseResponse.model_validate(course)
+    if course.thinker:
+        data.thinker_name = course.thinker.name
+    return data
 
 
 @router.post("/", response_model=CourseResponse, status_code=201)

@@ -1,18 +1,33 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.config import settings
 from app.db.session import get_db
 from app.models.course import Course
 from app.models.lecture import Lecture
 from app.schemas.lecture import LectureGenerateRequest, LectureResponse
 from app.services.lecture_generator import generate_lecture_transcript
-from app.services.tts_service import generate_audio
 
 router = APIRouter(prefix="/api/lectures", tags=["lectures"])
+
+
+def _require_admin(x_admin_key: str | None):
+    """Validate admin API key."""
+    if not settings.admin_api_key or x_admin_key != settings.admin_api_key:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+
+async def _generate_audio_for_lecture(transcript: str, thinker_name: str, lecture_id):
+    """Dispatch to the configured TTS provider."""
+    if settings.tts_provider == "openai":
+        from app.services.openai_tts_service import generate_audio
+    else:
+        from app.services.tts_service import generate_audio
+    return await generate_audio(transcript, thinker_name, lecture_id)
 
 
 @router.get("/", response_model=list[LectureResponse])
@@ -28,17 +43,31 @@ async def list_lectures(
 
 @router.get("/{lecture_id}", response_model=LectureResponse)
 async def get_lecture(lecture_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
-    lecture = await db.get(Lecture, lecture_id)
+    result = await db.execute(
+        select(Lecture)
+        .options(selectinload(Lecture.course).selectinload(Course.thinker))
+        .where(Lecture.id == lecture_id)
+    )
+    lecture = result.scalar_one_or_none()
     if not lecture:
         raise HTTPException(status_code=404, detail="Lecture not found")
-    return lecture
+    resp = LectureResponse.model_validate(lecture)
+    if lecture.course:
+        resp.course_title = lecture.course.title
+        if lecture.course.thinker:
+            resp.thinker_name = lecture.course.thinker.name
+            resp.thinker_image_url = lecture.course.thinker.image_url
+    return resp
 
 
 @router.post("/generate", response_model=LectureResponse, status_code=201)
 async def generate_lecture(
-    data: LectureGenerateRequest, db: AsyncSession = Depends(get_db)
+    data: LectureGenerateRequest,
+    db: AsyncSession = Depends(get_db),
+    x_admin_key: str | None = Header(None),
 ):
-    """Generate a new lecture transcript using AI."""
+    """Generate a new lecture transcript using AI. Admin only."""
+    _require_admin(x_admin_key)
     result = await db.execute(
         select(Course)
         .options(selectinload(Course.thinker), selectinload(Course.lectures))
@@ -52,7 +81,7 @@ async def generate_lecture(
     next_seq = len(course.lectures) + 1
 
     lecture = Lecture(
-        title=data.topic,
+        title=data.title,
         sequence_number=next_seq,
         course_id=course.id,
         status="generating",
@@ -80,9 +109,12 @@ async def generate_lecture(
 
 @router.post("/{lecture_id}/generate-audio", response_model=LectureResponse)
 async def generate_lecture_audio(
-    lecture_id: uuid.UUID, db: AsyncSession = Depends(get_db)
+    lecture_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    x_admin_key: str | None = Header(None),
 ):
-    """Generate TTS audio for an existing lecture."""
+    """Generate TTS audio for an existing lecture. Admin only."""
+    _require_admin(x_admin_key)
     result = await db.execute(
         select(Lecture)
         .options(selectinload(Lecture.course).selectinload(Course.thinker))
@@ -101,7 +133,7 @@ async def generate_lecture_audio(
     thinker_name = lecture.course.thinker.name
 
     try:
-        result = await generate_audio(
+        result = await _generate_audio_for_lecture(
             transcript=lecture.transcript,
             thinker_name=thinker_name,
             lecture_id=lecture.id,

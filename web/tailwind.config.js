@@ -7,17 +7,29 @@ export default {
   theme: {
     extend: {
       colors: {
-        parchment: '#f5f0e8',
-        ink: '#2c2c2c',
-        gold: '#c9a84c',
-        burgundy: '#722f37',
-        navy: '#1b2a4a',
+        parchment: 'var(--color-bg)',
+        ink: 'var(--color-ink)',
+        gold: 'var(--color-accent)',
+        burgundy: 'var(--color-danger)',
+        navy: 'var(--color-primary)',
+        surface: 'var(--color-surface)',
+        muted: 'var(--color-muted)',
+        link: 'var(--color-link)',
+        'nav-bg': 'var(--color-nav-bg)',
+        'nav-text': 'var(--color-nav-text)',
+        'card-hover': 'var(--color-card-hover)',
+        'input-bg': 'var(--color-input-bg)',
       },
       fontFamily: {
-        serif: ['Georgia', 'Cambria', '"Times New Roman"', 'serif'],
+        serif: ['"Playfair Display"', 'Georgia', 'Cambria', 'serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      borderColor: {
+        DEFAULT: 'var(--color-border)',
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }

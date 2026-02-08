@@ -2,8 +2,261 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════
+   Theme: Classical — Warm parchment, navy, gold
+   Inspired by: Traditional academic aesthetics
+   ═══════════════════════════════════════════════════ */
+:root, [data-theme="classical"] {
+  --color-bg: #faf7f2;
+  --color-ink: #2d3748;
+  --color-accent: #b8860b;
+  --color-danger: #c53030;
+  --color-primary: #1b2a4a;
+  --color-surface: #ffffff;
+  --color-muted: #718096;
+  --color-btn-text: #ffffff;
+  --color-avatar-bg: #eee8dc;
+  --color-avatar-text: #1b2a4a;
+  --color-border: #e2ddd5;
+  --color-link: #2b6cb0;
+  --color-nav-bg: #1b2a4a;
+  --color-nav-text: #f7fafc;
+  --color-card-hover: #f7f3ec;
+  --color-input-bg: #ffffff;
+  --color-hero-gradient-from: #1b2a4a;
+  --color-hero-gradient-to: #2c4a7c;
+}
+
+/* ═══════════════════════════════════════════════════
+   Theme: Midnight — GitHub Dark inspired
+   Slate backgrounds, blue accents, crisp whites
+   ═══════════════════════════════════════════════════ */
+[data-theme="midnight"] {
+  --color-bg: #0d1117;
+  --color-ink: #e6edf3;
+  --color-accent: #58a6ff;
+  --color-danger: #f85149;
+  --color-primary: #161b22;
+  --color-surface: #161b22;
+  --color-muted: #8b949e;
+  --color-btn-text: #ffffff;
+  --color-avatar-bg: #21262d;
+  --color-avatar-text: #58a6ff;
+  --color-border: #30363d;
+  --color-link: #58a6ff;
+  --color-nav-bg: #010409;
+  --color-nav-text: #f0f6fc;
+  --color-card-hover: #1c2129;
+  --color-input-bg: #0d1117;
+  --color-hero-gradient-from: #010409;
+  --color-hero-gradient-to: #161b22;
+}
+
+/* ═══════════════════════════════════════════════════
+   Theme: Nord — Arctic frost
+   Cool blue-grays, aurora teal accent
+   ═══════════════════════════════════════════════════ */
+[data-theme="nord"] {
+  --color-bg: #2e3440;
+  --color-ink: #eceff4;
+  --color-accent: #88c0d0;
+  --color-danger: #bf616a;
+  --color-primary: #3b4252;
+  --color-surface: #3b4252;
+  --color-muted: #d8dee9;
+  --color-btn-text: #2e3440;
+  --color-avatar-bg: #434c5e;
+  --color-avatar-text: #88c0d0;
+  --color-border: #4c566a;
+  --color-link: #88c0d0;
+  --color-nav-bg: #242933;
+  --color-nav-text: #eceff4;
+  --color-card-hover: #434c5e;
+  --color-input-bg: #3b4252;
+  --color-hero-gradient-from: #242933;
+  --color-hero-gradient-to: #3b4252;
+}
+
+/* ═══════════════════════════════════════════════════
+   Theme: Rosé Pine — Warm, muted elegance
+   Deep purple-gray, rose/lavender accents
+   ═══════════════════════════════════════════════════ */
+[data-theme="rose-pine"] {
+  --color-bg: #191724;
+  --color-ink: #e0def4;
+  --color-accent: #c4a7e7;
+  --color-danger: #eb6f92;
+  --color-primary: #1f1d2e;
+  --color-surface: #1f1d2e;
+  --color-muted: #908caa;
+  --color-btn-text: #191724;
+  --color-avatar-bg: #26233a;
+  --color-avatar-text: #c4a7e7;
+  --color-border: #393552;
+  --color-link: #c4a7e7;
+  --color-nav-bg: #13111e;
+  --color-nav-text: #e0def4;
+  --color-card-hover: #26233a;
+  --color-input-bg: #26233a;
+  --color-hero-gradient-from: #13111e;
+  --color-hero-gradient-to: #26233a;
+}
+
+/* ═══ Base styles ═══ */
 @layer base {
   body {
     @apply font-serif antialiased;
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
+
+  /* Prose (markdown transcript) overrides for all themes */
+  .prose {
+    --tw-prose-body: var(--color-ink);
+    --tw-prose-headings: var(--color-ink);
+    --tw-prose-bold: var(--color-ink);
+    --tw-prose-quotes: var(--color-muted);
+    --tw-prose-code: var(--color-accent);
+    --tw-prose-links: var(--color-link);
+    --tw-prose-counters: var(--color-muted);
+    --tw-prose-bullets: var(--color-muted);
+    --tw-prose-hr: var(--color-border);
+    color: var(--color-ink);
+  }
+  .prose strong { color: var(--color-ink); }
+  .prose h1, .prose h2, .prose h3, .prose h4 { color: var(--color-ink); }
+  .prose a { color: var(--color-link); }
+  .prose blockquote {
+    border-left-color: var(--color-accent);
+    color: var(--color-muted);
+    font-style: italic;
+  }
+  .prose code {
+    color: var(--color-accent);
+    background-color: var(--color-surface);
+    padding: 0.15em 0.35em;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+  }
+}
+
+/* ═══ Reusable component classes ═══ */
+@layer components {
+  /* Primary action button (gold bg) */
+  .btn-primary {
+    @apply px-6 py-2.5 rounded-lg font-sans font-semibold text-sm
+           transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed
+           shadow-sm hover:shadow-md active:scale-[0.98];
+    background-color: var(--color-accent);
+    color: var(--color-btn-text);
+  }
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+
+  /* Secondary / outline button */
+  .btn-secondary {
+    @apply px-5 py-2 rounded-lg font-sans font-medium text-sm
+           transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed
+           active:scale-[0.98];
+    color: var(--color-link);
+    border: 1px solid var(--color-border);
+    background: transparent;
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background-color: var(--color-card-hover);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  /* Ghost button (minimal) */
+  .btn-ghost {
+    @apply px-4 py-2 rounded-lg font-sans font-medium text-sm
+           transition-colors duration-200;
+    color: var(--color-muted);
+  }
+  .btn-ghost:hover {
+    color: var(--color-accent);
+    background-color: var(--color-card-hover);
+  }
+
+  /* Text input / textarea */
+  .input {
+    @apply w-full px-4 py-3 rounded-lg font-sans text-sm
+           transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-offset-0;
+    background-color: var(--color-input-bg);
+    color: var(--color-ink);
+    border: 1px solid var(--color-border);
+    focus-ring-color: var(--color-accent);
+  }
+  .input:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 25%, transparent);
+  }
+
+  /* Card container */
+  .card {
+    @apply rounded-xl transition-all duration-200;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+  }
+  .card-interactive {
+    @apply card cursor-pointer;
+  }
+  .card-interactive:hover {
+    background-color: var(--color-card-hover);
+    box-shadow: 0 4px 12px -2px rgba(0,0,0,0.12);
+    transform: translateY(-1px);
+  }
+
+  /* Badge / pill */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full
+           text-xs font-sans font-medium uppercase tracking-wider;
+    background-color: color-mix(in srgb, var(--color-accent) 15%, transparent);
+    color: var(--color-accent);
+  }
+
+  /* Back navigation link */
+  .back-link {
+    @apply inline-flex items-center gap-1 font-sans text-sm transition-colors duration-200;
+    color: var(--color-muted);
+  }
+  .back-link:hover {
+    color: var(--color-accent);
+  }
+
+  /* Status dot indicators */
+  .status-ready { @apply text-emerald-500; }
+  .status-generating { @apply text-amber-500; }
+  .status-error { @apply text-red-500; }
+}
+
+/* ═══ Placeholder text ═══ */
+::placeholder {
+  color: var(--color-muted);
+  opacity: 0.6;
+}
+
+/* ═══ Audio player theme-awareness ═══ */
+audio::-webkit-media-controls-panel {
+  background-color: var(--color-surface);
+}
+
+/* ═══ Selection color ═══ */
+::selection {
+  background-color: color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
+/* ═══ Scrollbar (Webkit) ═══ */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
 }
