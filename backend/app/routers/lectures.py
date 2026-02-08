@@ -23,7 +23,9 @@ def _require_admin(x_admin_key: str | None):
 
 async def _generate_audio_for_lecture(transcript: str, thinker_name: str, lecture_id):
     """Dispatch to the configured TTS provider."""
-    if settings.tts_provider == "openai":
+    if settings.tts_provider == "azure":
+        from app.services.azure_tts_service import generate_audio
+    elif settings.tts_provider == "openai":
         from app.services.openai_tts_service import generate_audio
     else:
         from app.services.tts_service import generate_audio

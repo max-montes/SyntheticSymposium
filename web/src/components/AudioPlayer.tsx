@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 
-const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2]
+const SPEED_MIN = 0.5
+const SPEED_MAX = 3.0
+const SPEED_STEP = 0.25
 
 interface Props {
   src: string
@@ -73,13 +75,24 @@ export default function AudioPlayer({ src, audioRef }: Props) {
     setCurrentTime(a.currentTime)
   }
 
-  const cycleSpeed = () => {
+  const changeSpeed = useCallback((delta: number) => {
     const a = audioRef.current
     if (!a) return
-    const idx = SPEEDS.indexOf(speed)
-    const next = SPEEDS[(idx + 1) % SPEEDS.length]
+    const next = Math.round(Math.max(SPEED_MIN, Math.min(SPEED_MAX, speed + delta)) * 100) / 100
     a.playbackRate = next
     setSpeed(next)
+  }, [audioRef, speed])
+
+  const onSpeedWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault()
+    changeSpeed(e.deltaY < 0 ? SPEED_STEP : -SPEED_STEP)
+  }, [changeSpeed])
+
+  const resetSpeed = () => {
+    const a = audioRef.current
+    if (!a) return
+    a.playbackRate = 1
+    setSpeed(1)
   }
 
   const skip = (secs: number) => {
@@ -174,18 +187,46 @@ export default function AudioPlayer({ src, audioRef }: Props) {
           +15s
         </button>
 
-        {/* Speed */}
-        <button
-          onClick={cycleSpeed}
-          className="px-3 py-1.5 rounded-md text-sm font-sans font-bold transition-colors shrink-0"
-          style={{
-            backgroundColor: speed !== 1 ? 'color-mix(in srgb, var(--color-accent) 15%, transparent)' : 'var(--color-card-hover, var(--color-border))',
-            color: speed !== 1 ? 'var(--color-accent)' : 'var(--color-muted)',
-          }}
-          aria-label={`Playback speed: ${speed}x`}
+        {/* Speed — scroll to adjust, click to reset to 1× */}
+        <div
+          onWheel={onSpeedWheel}
+          className="flex items-center gap-1 shrink-0 select-none"
+          title="Scroll to adjust speed, click to reset"
         >
-          {speed}×
-        </button>
+          <button
+            onClick={() => changeSpeed(-SPEED_STEP)}
+            className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold transition-colors"
+            style={{
+              color: 'var(--color-muted)',
+              border: '1px solid var(--color-border)',
+            }}
+            aria-label="Decrease speed"
+          >
+            −
+          </button>
+          <button
+            onClick={resetSpeed}
+            className="px-2 py-1 rounded-md text-sm font-sans font-bold transition-colors min-w-[3.2rem] text-center"
+            style={{
+              backgroundColor: speed !== 1 ? 'color-mix(in srgb, var(--color-accent) 15%, transparent)' : 'var(--color-card-hover, var(--color-border))',
+              color: speed !== 1 ? 'var(--color-accent)' : 'var(--color-muted)',
+            }}
+            aria-label={`Playback speed: ${speed}x. Click to reset.`}
+          >
+            {speed}×
+          </button>
+          <button
+            onClick={() => changeSpeed(SPEED_STEP)}
+            className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold transition-colors"
+            style={{
+              color: 'var(--color-muted)',
+              border: '1px solid var(--color-border)',
+            }}
+            aria-label="Increase speed"
+          >
+            +
+          </button>
+        </div>
       </div>
     </div>
   )

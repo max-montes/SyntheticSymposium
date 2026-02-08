@@ -12,7 +12,11 @@ class Settings(BaseSettings):
 
     # OpenAI TTS
     openai_api_key: str = ""
-    tts_provider: str = "edge-tts"  # "openai" or "edge-tts"
+    tts_provider: str = "edge-tts"  # "azure", "openai", or "edge-tts"
+
+    # Azure Speech
+    azure_speech_key: str = ""
+    azure_speech_region: str = "eastus"
 
     # Admin
     admin_api_key: str = ""
