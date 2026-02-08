@@ -4,7 +4,7 @@ const FEATURED_THINKERS = [
   { name: 'Albert Einstein', field: 'Physics', era: '1879–1955' },
   { name: 'Friedrich Nietzsche', field: 'Philosophy', era: '1844–1900' },
   { name: 'Richard Feynman', field: 'Physics', era: '1918–1988' },
-  { name: 'Marie Curie', field: 'Chemistry & Physics', era: '1867–1934' },
+  { name: 'Simone de Beauvoir', field: 'Philosophy', era: '1908–1986' },
   { name: 'Ada Lovelace', field: 'Computer Science', era: '1815–1852' },
   { name: 'Socrates', field: 'Philosophy', era: '470–399 BC' },
 ]

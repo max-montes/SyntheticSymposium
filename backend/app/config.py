@@ -2,10 +2,8 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    # Database
-    database_url: str = (
-        "postgresql+asyncpg://symposium:symposium_dev@localhost:5432/synthetic_symposium"
-    )
+    # Database — defaults to SQLite for local dev; set DATABASE_URL for PostgreSQL in production
+    database_url: str = "sqlite+aiosqlite:///./symposium.db"
 
     # GitHub Models API
     github_token: str = ""
