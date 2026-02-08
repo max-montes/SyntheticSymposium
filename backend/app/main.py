@@ -1,7 +1,9 @@
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.db.base import Base
@@ -43,6 +45,11 @@ def create_app() -> FastAPI:
     application.include_router(thinkers.router)
     application.include_router(courses.router)
     application.include_router(lectures.router)
+
+    # Serve generated audio files
+    audio_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "audio")
+    os.makedirs(audio_dir, exist_ok=True)
+    application.mount("/audio", StaticFiles(directory=audio_dir), name="audio")
 
     return application
 

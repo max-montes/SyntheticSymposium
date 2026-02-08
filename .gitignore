@@ -39,6 +39,7 @@ web/dist/
 *.mp3
 *.wav
 audio_files/
+backend/audio/
 
 # Docker
 docker-compose.override.yml

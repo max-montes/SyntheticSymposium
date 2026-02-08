@@ -10,6 +10,7 @@ from app.models.course import Course
 from app.models.lecture import Lecture
 from app.schemas.lecture import LectureGenerateRequest, LectureResponse
 from app.services.lecture_generator import generate_lecture_transcript
+from app.services.tts_service import generate_audio
 
 router = APIRouter(prefix="/api/lectures", tags=["lectures"])
 
@@ -74,4 +75,44 @@ async def generate_lecture(
 
     await db.flush()
     await db.refresh(lecture)
+    return lecture
+
+
+@router.post("/{lecture_id}/generate-audio", response_model=LectureResponse)
+async def generate_lecture_audio(
+    lecture_id: uuid.UUID, db: AsyncSession = Depends(get_db)
+):
+    """Generate TTS audio for an existing lecture."""
+    result = await db.execute(
+        select(Lecture)
+        .options(selectinload(Lecture.course).selectinload(Course.thinker))
+        .where(Lecture.id == lecture_id)
+    )
+    lecture = result.scalar_one_or_none()
+    if not lecture:
+        raise HTTPException(status_code=404, detail="Lecture not found")
+
+    if lecture.status != "ready":
+        raise HTTPException(status_code=400, detail="Lecture transcript not ready")
+
+    if not lecture.transcript:
+        raise HTTPException(status_code=400, detail="Lecture has no transcript")
+
+    thinker_name = lecture.course.thinker.name
+
+    try:
+        result = await generate_audio(
+            transcript=lecture.transcript,
+            thinker_name=thinker_name,
+            lecture_id=lecture.id,
+        )
+        lecture.audio_url = result.url
+        lecture.duration_seconds = result.duration_seconds
+        await db.flush()
+        await db.refresh(lecture)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Audio generation failed: {str(e)}"
+        )
+
     return lecture

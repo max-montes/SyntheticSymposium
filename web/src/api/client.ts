@@ -76,3 +76,11 @@ export async function generateLecture(courseId: string, topic: string): Promise<
   if (!res.ok) throw new Error('Failed to generate lecture')
   return res.json()
 }
+
+export async function generateAudio(lectureId: string): Promise<Lecture> {
+  const res = await fetch(`${API_BASE}/lectures/${lectureId}/generate-audio`, {
+    method: 'POST',
+  })
+  if (!res.ok) throw new Error('Failed to generate audio')
+  return res.json()
+}
