@@ -26,21 +26,19 @@ class VoiceConfig:
 
 
 # Azure Neural Voice mapping with SSML accent/style controls
+# For accented English: use native-language voices reading English text
 AZURE_VOICE_MAP: dict[str, VoiceConfig] = {
     "Socrates": VoiceConfig(
-        voice_name="en-US-DavisNeural",
-        rate="-15%", pitch="-10%",
-        lang="el-GR",  # Greek accent
+        voice_name="el-GR-NestorasNeural",  # Greek voice → natural Greek accent
+        rate="-5%",
     ),
     "Albert Einstein": VoiceConfig(
-        voice_name="en-US-DavisNeural",
-        rate="-5%", pitch="-5%",
-        lang="de-DE",  # German accent
+        voice_name="de-DE-ConradNeural",  # German voice → natural German accent
+        rate="-5%",
     ),
     "Friedrich Nietzsche": VoiceConfig(
-        voice_name="en-US-GuyNeural",
-        rate="+5%", pitch="-5%",
-        lang="de-DE",  # German accent
+        voice_name="de-DE-KillianNeural",  # German voice, different timbre
+        rate="+5%",
     ),
     "Richard Feynman": VoiceConfig(
         voice_name="en-US-JasonNeural",
@@ -51,9 +49,8 @@ AZURE_VOICE_MAP: dict[str, VoiceConfig] = {
         rate="-5%",
     ),
     "Nikola Tesla": VoiceConfig(
-        voice_name="en-US-DavisNeural",
+        voice_name="sr-RS-NicholasNeural",  # Serbian voice → natural Serbian accent
         rate="-5%",
-        lang="sr-RS",  # Serbian accent
     ),
     "Carl Sagan": VoiceConfig(
         voice_name="en-US-BrandonNeural",
@@ -64,23 +61,20 @@ AZURE_VOICE_MAP: dict[str, VoiceConfig] = {
         rate="-5%",
     ),
     "Ludwig Wittgenstein": VoiceConfig(
-        voice_name="en-GB-RyanNeural",
+        voice_name="de-AT-JonasNeural",  # Austrian German voice
         rate="-10%",
-        lang="de-AT",  # Austrian German accent
     ),
     "Fyodor Dostoevsky": VoiceConfig(
-        voice_name="en-US-DavisNeural",
-        rate="-10%", pitch="-10%",
-        lang="ru-RU",  # Russian accent
+        voice_name="ru-RU-DmitryNeural",  # Russian voice → natural Russian accent
+        rate="-10%",
     ),
     "Siddhartha Gautama": VoiceConfig(
         voice_name="en-IN-PrabhatNeural",
         rate="-15%",
     ),
     "Simone de Beauvoir": VoiceConfig(
-        voice_name="en-US-JennyNeural",
+        voice_name="fr-FR-HenriNeural",  # French voice → natural French accent
         rate="-5%",
-        lang="fr-FR",  # French accent
     ),
 }
 
